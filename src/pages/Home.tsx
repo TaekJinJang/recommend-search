@@ -9,12 +9,12 @@ import RecommendSearch from 'components/RecommendSearch';
 
 const Home = () => {
     const [onFocus, setOnFocus] = useState<boolean>(false);
-    const {value, handleInputChange, debouncedValue} = useDebounceInput();
+    const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
     const [recommendSearchArr, setRecommendSearchArr] = useState<searchItemType[]>([]);
-    console.info(value);
+    const [selected, setSelected] = useState(-1);
     const inputFocus = () => {
-        setOnFocus(true);
-        console.info(onFocus, '포커스');
+        if (onFocus === true) setSelected(-1);
+        setOnFocus(prev => !prev);
     };
 
     useEffect(() => {
@@ -26,6 +26,32 @@ const Home = () => {
 
         getSearch();
     }, [debouncedValue]);
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (onFocus && recommendSearchArr.length > 0) {
+            const lastIndex = recommendSearchArr.length - 1;
+            switch (event.key) {
+                case 'ArrowDown':
+                    if (recommendSearchArr.length - 1 > selected) setSelected(prev => prev + 1);
+                    if (lastIndex === selected) setSelected(0);
+                    break;
+                case 'ArrowUp':
+                    if (selected === 0) setSelected(lastIndex);
+                    else setSelected(prev => prev - 1);
+                    break;
+                case 'Enter':
+                    event.preventDefault();
+                    if (selected >= 0) {
+                        setValue(recommendSearchArr[selected].sickNm);
+                        setSelected(-1);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     console.info(recommendSearchArr);
     return (
         <HomeContainer>
@@ -36,12 +62,15 @@ const Home = () => {
             </HomeHeader>
             <SearchContainer>
                 <AiOutlineSearch size='24' color='#000000' />
+
                 <input
                     type='text'
                     value={value}
                     onChange={handleInputChange}
                     placeholder='질환명을 입력해 주세요.'
                     onFocus={inputFocus}
+                    onBlur={inputFocus}
+                    onKeyDown={handleKeyDown}
                 />
                 <button>
                     <AiOutlineSearch size='24' color='#ffffff' />
@@ -51,9 +80,19 @@ const Home = () => {
                 <RecommendContainer>
                     <RecommendSearch title={value} />
                     <SectionTitle>추천 검색어</SectionTitle>
-                    {recommendSearchArr.map(search => {
-                        return <RecommendSearch key={search.sickCd} title={search.sickNm} />;
-                    })}
+                    {recommendSearchArr.length !== 0 ? (
+                        recommendSearchArr.map((search, index) => {
+                            return (
+                                <RecommendSearch
+                                    key={search.sickCd}
+                                    title={search.sickNm}
+                                    selected={selected === index}
+                                />
+                            );
+                        })
+                    ) : (
+                        <div className='noRecommend'>검색어 없음</div>
+                    )}
                 </RecommendContainer>
             )}
         </HomeContainer>
@@ -110,6 +149,10 @@ const RecommendContainer = styled.div`
     width: 490px;
     border-radius: 15px;
     background-color: #ffffff;
+    .noRecommend {
+        text-align: center;
+        color: #a7afb7;
+    }
 `;
 
 const SectionTitle = styled.div`

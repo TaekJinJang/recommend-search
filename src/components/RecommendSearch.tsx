@@ -1,9 +1,14 @@
 import styled from 'styled-components';
 import {AiOutlineSearch} from 'react-icons/ai';
 
-const RecommendSearch = ({title}: {title: string}) => {
+interface RecommendSearchTypes {
+    title: string;
+    selected?: boolean;
+}
+
+const RecommendSearch = ({title, selected = false}: RecommendSearchTypes) => {
     return (
-        <RecommendItem>
+        <RecommendItem className={selected ? 'selected' : ''}>
             <AiOutlineSearch size='24' color='#000000' />
             <span>{title}</span>
         </RecommendItem>
@@ -18,7 +23,8 @@ const RecommendItem = styled.div`
     align-items: center;
     font-weight: 600;
     cursor: pointer;
-    &:hover {
+    &:hover,
+    &.selected {
         background-color: rgba(128, 128, 128, 0.1);
     }
     span {
