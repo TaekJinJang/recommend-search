@@ -5,26 +5,28 @@ import useDebounceInput from 'hooks/useDebounceInput';
 import {getRecommendSearch} from 'apis/search';
 import {searchItemType} from 'types/search';
 import {MAX_RECOMMEND_NUM} from 'constants/api';
+import RecommendSearch from 'components/RecommendSearch';
 
 const Home = () => {
-    const [onfocus, setOnfocus] = useState<boolean>(false);
-    const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
-    const [recommendSearch, setRecommendSearch] = useState<searchItemType[]>([]);
+    const [onFocus, setOnFocus] = useState<boolean>(false);
+    const {value, handleInputChange, debouncedValue} = useDebounceInput();
+    const [recommendSearchArr, setRecommendSearchArr] = useState<searchItemType[]>([]);
     console.info(value);
     const inputFocus = () => {
-        setOnfocus(true);
+        setOnFocus(true);
+        console.info(onFocus, '포커스');
     };
 
     useEffect(() => {
         const getSearch = async () => {
             const res = await getRecommendSearch(debouncedValue);
             const sliceRes = res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
-            setRecommendSearch(sliceRes);
+            setRecommendSearchArr(sliceRes);
         };
 
         getSearch();
     }, [debouncedValue]);
-    console.info(recommendSearch);
+    console.info(recommendSearchArr);
     return (
         <HomeContainer>
             <HomeHeader>
@@ -45,6 +47,15 @@ const Home = () => {
                     <AiOutlineSearch size='24' color='#ffffff' />
                 </button>
             </SearchContainer>
+            {onFocus && (
+                <RecommendContainer>
+                    <RecommendSearch title={value} />
+                    <SectionTitle>추천 검색어</SectionTitle>
+                    {recommendSearchArr.map(search => {
+                        return <RecommendSearch key={search.sickCd} title={search.sickNm} />;
+                    })}
+                </RecommendContainer>
+            )}
         </HomeContainer>
     );
 };
@@ -91,4 +102,20 @@ const SearchContainer = styled.form`
         background-color: #007be9;
         cursor: pointer;
     }
+`;
+
+const RecommendContainer = styled.div`
+    padding: 20px 0;
+    margin-top: 5px;
+    width: 490px;
+    border-radius: 15px;
+    background-color: #ffffff;
+`;
+
+const SectionTitle = styled.div`
+    padding: 0 20px;
+    margin: 6px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #53585d;
 `;
