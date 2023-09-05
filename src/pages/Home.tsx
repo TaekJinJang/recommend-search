@@ -1,7 +1,30 @@
 import styled from 'styled-components';
 import {AiOutlineSearch} from 'react-icons/ai';
+import {useEffect, useState} from 'react';
+import useDebounceInput from 'hooks/useDebounceInput';
+import {getRecommendSearch} from 'apis/search';
+import {searchItemType} from 'types/search';
+import {MAX_RECOMMEND_NUM} from 'constants/api';
 
 const Home = () => {
+    const [onfocus, setOnfocus] = useState<boolean>(false);
+    const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
+    const [recommendSearch, setRecommendSearch] = useState<searchItemType[]>([]);
+    console.info(value);
+    const inputFocus = () => {
+        setOnfocus(true);
+    };
+
+    useEffect(() => {
+        const getSearch = async () => {
+            const res = await getRecommendSearch(debouncedValue);
+            const sliceRes = res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
+            setRecommendSearch(sliceRes);
+        };
+
+        getSearch();
+    }, [debouncedValue]);
+    console.info(recommendSearch);
     return (
         <HomeContainer>
             <HomeHeader>
@@ -11,7 +34,13 @@ const Home = () => {
             </HomeHeader>
             <SearchContainer>
                 <AiOutlineSearch size='24' color='#000000' />
-                <input type='text' placeholder='질환명을 입력해 주세요.' />
+                <input
+                    type='text'
+                    value={value}
+                    onChange={handleInputChange}
+                    placeholder='질환명을 입력해 주세요.'
+                    onFocus={inputFocus}
+                />
                 <button>
                     <AiOutlineSearch size='24' color='#ffffff' />
                 </button>
