@@ -31,13 +31,13 @@ const Home = () => {
     }, []);
 
     useEffect(() => {
+        const isKoreanJamo = (str: string) => /[ㄱ-ㅎㅏ-ㅣ]/.test(str);
         const getSearch = async () => {
             const res = await getRecommendSearch(debouncedValue);
             const sliceRes = res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
             setRecommendSearchArr(sliceRes);
         };
-
-        getSearch();
+        if (!isKoreanJamo(debouncedValue)) getSearch();
     }, [debouncedValue]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
