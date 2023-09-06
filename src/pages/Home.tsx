@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {AiOutlineSearch} from 'react-icons/ai';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import useDebounceInput from 'hooks/useDebounceInput';
 import {getRecommendSearch} from 'apis/search';
 import {searchItemType} from 'types/search';
@@ -12,10 +12,22 @@ const Home = () => {
     const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
     const [recommendSearchArr, setRecommendSearchArr] = useState<searchItemType[]>([]);
     const [selected, setSelected] = useState(-1);
+
     const inputFocus = () => {
-        if (onFocus === true) setSelected(-1);
-        setOnFocus(prev => !prev);
+        setOnFocus(true);
     };
+    const searchRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setOnFocus(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         const getSearch = async () => {
@@ -52,7 +64,6 @@ const Home = () => {
         }
     };
 
-    console.info(recommendSearchArr);
     return (
         <HomeContainer>
             <HomeHeader>
@@ -60,41 +71,43 @@ const Home = () => {
                 <br />
                 온라인으로 참여하기
             </HomeHeader>
-            <SearchContainer>
-                <AiOutlineSearch size='24' color='#000000' />
+            <section ref={searchRef}>
+                <SearchContainer>
+                    <AiOutlineSearch size='24' color='#000000' />
 
-                <input
-                    type='text'
-                    value={value}
-                    onChange={handleInputChange}
-                    placeholder='질환명을 입력해 주세요.'
-                    onFocus={inputFocus}
-                    onBlur={inputFocus}
-                    onKeyDown={handleKeyDown}
-                />
-                <button>
-                    <AiOutlineSearch size='24' color='#ffffff' />
-                </button>
-            </SearchContainer>
-            {onFocus && (
-                <RecommendContainer>
-                    <RecommendSearch title={value} />
-                    <SectionTitle>추천 검색어</SectionTitle>
-                    {recommendSearchArr.length !== 0 ? (
-                        recommendSearchArr.map((search, index) => {
-                            return (
-                                <RecommendSearch
-                                    key={search.sickCd}
-                                    title={search.sickNm}
-                                    selected={selected === index}
-                                />
-                            );
-                        })
-                    ) : (
-                        <div className='noRecommend'>검색어 없음</div>
-                    )}
-                </RecommendContainer>
-            )}
+                    <input
+                        type='text'
+                        value={value}
+                        onChange={handleInputChange}
+                        placeholder='질환명을 입력해 주세요.'
+                        onFocus={inputFocus}
+                        // onBlur={inputFocus}
+                        onKeyDown={handleKeyDown}
+                    />
+                    <button>
+                        <AiOutlineSearch size='24' color='#ffffff' />
+                    </button>
+                </SearchContainer>
+                {onFocus && (
+                    <RecommendContainer>
+                        <RecommendSearch title={value} />
+                        <SectionTitle>추천 검색어</SectionTitle>
+                        {recommendSearchArr.length !== 0 ? (
+                            recommendSearchArr.map((search, index) => {
+                                return (
+                                    <RecommendSearch
+                                        key={search.sickCd}
+                                        title={search.sickNm}
+                                        selected={selected === index}
+                                    />
+                                );
+                            })
+                        ) : (
+                            <div className='noRecommend'>검색어 없음</div>
+                        )}
+                    </RecommendContainer>
+                )}
+            </section>
         </HomeContainer>
     );
 };
