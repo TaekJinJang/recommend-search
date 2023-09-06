@@ -82,7 +82,6 @@ const Home = () => {
                         onChange={handleInputChange}
                         placeholder='질환명을 입력해 주세요.'
                         onFocus={inputFocus}
-                        // onBlur={inputFocus}
                         onKeyDown={handleKeyDown}
                     />
                     <button>
