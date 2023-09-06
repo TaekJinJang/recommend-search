@@ -16,6 +16,7 @@ const Home = () => {
     const inputFocus = () => {
         setOnFocus(true);
     };
+
     const searchRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -142,6 +143,7 @@ const SearchContainer = styled.form`
         border: none;
         margin-left: 10px;
         font-size: 17px;
+        outline: none;
     }
     button {
         border: none;
