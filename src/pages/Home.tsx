@@ -4,11 +4,12 @@ import {useEffect, useRef, useState} from 'react';
 import useDebounceInput from 'hooks/useDebounceInput';
 import RecommendSearch from 'components/RecommendSearch';
 import useRecsSearch from 'hooks/useRecsSearch';
+import LoadingSpinner from 'components/LoadingSpinner';
 
 const Home = () => {
     const [onFocus, setOnFocus] = useState<boolean>(false);
     const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
-    const {recsSearchList, getRecsSearch} = useRecsSearch();
+    const {recsSearchList, isLoading, getRecsSearch} = useRecsSearch();
     const [selected, setSelected] = useState(-1);
 
     const inputFocus = () => {
@@ -84,7 +85,9 @@ const Home = () => {
                     <RecommendContainer>
                         <RecommendSearch title={value} />
                         <SectionTitle>추천 검색어</SectionTitle>
-                        {recsSearchList.length !== 0 ? (
+                        {isLoading && <LoadingSpinner />}
+                        {recsSearchList.length !== 0 &&
+                            !isLoading &&
                             recsSearchList.map((search, index) => {
                                 return (
                                     <RecommendSearch
@@ -93,8 +96,8 @@ const Home = () => {
                                         selected={selected === index}
                                     />
                                 );
-                            })
-                        ) : (
+                            })}
+                        {recsSearchList.length === 0 && (
                             <div className='noRecommend'>검색어 없음</div>
                         )}
                     </RecommendContainer>
