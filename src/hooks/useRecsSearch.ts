@@ -6,11 +6,14 @@ import * as cacheStorage from 'utils/cacheStorage';
 
 const useRecsSearch = () => {
     const [recsSearchList, setRecsSearchList] = useState<searchItemType[]>([]);
+
     const getRecsSearch = useCallback(async (search: string) => {
         const isKoreanJamo = (str: string) => /[ㄱ-ㅎㅏ-ㅣ]/.test(str);
         if (!isKoreanJamo(search) && search.length > 0) {
             const cachedResponse = await cacheStorage.getCache(search);
-            const res = cachedResponse ? cachedResponse.json : await getRecommendSearch(search);
+            const res = cachedResponse
+                ? await cachedResponse.json()
+                : await getRecommendSearch(search);
             const sliceRes = res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
             if (!cachedResponse) await cacheStorage.setCache(search, sliceRes);
             setRecsSearchList(sliceRes);
@@ -20,5 +23,3 @@ const useRecsSearch = () => {
 };
 
 export default useRecsSearch;
-
-// setRecommend~ 에 넣고
