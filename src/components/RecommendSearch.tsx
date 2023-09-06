@@ -1,14 +1,20 @@
 import styled from 'styled-components';
 import {AiOutlineSearch} from 'react-icons/ai';
+import {eventType} from 'types/search';
 
 interface RecommendSearchTypes {
     title: string;
     selected?: boolean;
+    onSubmit?: (event: eventType, title: string) => void;
 }
 
-const RecommendSearch = ({title, selected = false}: RecommendSearchTypes) => {
+const RecommendSearch = ({title, selected = false, onSubmit}: RecommendSearchTypes) => {
+    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        if (onSubmit) onSubmit(event, title);
+    };
     return (
-        <RecommendItem className={selected ? 'selected' : ''}>
+        <RecommendItem className={selected ? 'selected' : ''} onClick={handleClick}>
             <AiOutlineSearch size='24' color='#000000' />
             <span>{title}</span>
         </RecommendItem>

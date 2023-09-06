@@ -5,6 +5,7 @@ import useDebounceInput from 'hooks/useDebounceInput';
 import RecommendSearch from 'components/RecommendSearch';
 import useRecsSearch from 'hooks/useRecsSearch';
 import LoadingSpinner from 'components/LoadingSpinner';
+import {eventType} from 'types/search';
 
 const Home = () => {
     const [onFocus, setOnFocus] = useState<boolean>(false);
@@ -14,6 +15,13 @@ const Home = () => {
 
     const inputFocus = () => {
         setOnFocus(true);
+    };
+
+    const onSubmit = (event: eventType, str?: string) => {
+        event.preventDefault();
+
+        console.info(str ? str : value);
+        setValue('');
     };
 
     const searchRef = useRef<HTMLDivElement>(null);
@@ -46,9 +54,8 @@ const Home = () => {
                     else setSelected(prev => prev - 1);
                     break;
                 case 'Enter':
-                    event.preventDefault();
                     if (selected >= 0) {
-                        setValue(recsSearchList[selected].sickNm);
+                        onSubmit(event, recsSearchList[selected].sickNm);
                         setSelected(-1);
                     }
                     break;
@@ -66,7 +73,7 @@ const Home = () => {
                 온라인으로 참여하기
             </HomeHeader>
             <section ref={searchRef}>
-                <SearchContainer>
+                <SearchContainer onSubmit={onSubmit}>
                     <AiOutlineSearch size='24' color='#000000' />
 
                     <input
@@ -94,6 +101,7 @@ const Home = () => {
                                         key={search.sickCd}
                                         title={search.sickNm}
                                         selected={selected === index}
+                                        onSubmit={onSubmit}
                                     />
                                 );
                             })}
