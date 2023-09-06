@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react';
 import useDebounceInput from 'hooks/useDebounceInput';
 import {getRecommendSearch} from 'apis/search';
 import {searchItemType} from 'types/search';
-import {MAX_RECOMMEND_NUM} from 'constants/api';
+import {MAX_RECOMMEND_NUM} from 'constants/constants';
 import RecommendSearch from 'components/RecommendSearch';
 
 const Home = () => {
