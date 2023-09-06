@@ -2,15 +2,13 @@ import styled from 'styled-components';
 import {AiOutlineSearch} from 'react-icons/ai';
 import {useEffect, useRef, useState} from 'react';
 import useDebounceInput from 'hooks/useDebounceInput';
-import {getRecommendSearch} from 'apis/search';
-import {searchItemType} from 'types/search';
-import {MAX_RECOMMEND_NUM} from 'constants/constants';
 import RecommendSearch from 'components/RecommendSearch';
+import useRecsSearch from 'hooks/useRecsSearch';
 
 const Home = () => {
     const [onFocus, setOnFocus] = useState<boolean>(false);
     const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
-    const [recommendSearchArr, setRecommendSearchArr] = useState<searchItemType[]>([]);
+    const {recsSearchList, getRecsSearch} = useRecsSearch();
     const [selected, setSelected] = useState(-1);
 
     const inputFocus = () => {
@@ -31,21 +29,15 @@ const Home = () => {
     }, []);
 
     useEffect(() => {
-        const isKoreanJamo = (str: string) => /[ㄱ-ㅎㅏ-ㅣ]/.test(str);
-        const getSearch = async () => {
-            const res = await getRecommendSearch(debouncedValue);
-            const sliceRes = res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
-            setRecommendSearchArr(sliceRes);
-        };
-        if (!isKoreanJamo(debouncedValue)) getSearch();
+        getRecsSearch(debouncedValue);
     }, [debouncedValue]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (onFocus && recommendSearchArr.length > 0) {
-            const lastIndex = recommendSearchArr.length - 1;
+        if (onFocus && recsSearchList.length > 0) {
+            const lastIndex = recsSearchList.length - 1;
             switch (event.key) {
                 case 'ArrowDown':
-                    if (recommendSearchArr.length - 1 > selected) setSelected(prev => prev + 1);
+                    if (recsSearchList.length - 1 > selected) setSelected(prev => prev + 1);
                     if (lastIndex === selected) setSelected(0);
                     break;
                 case 'ArrowUp':
@@ -55,7 +47,7 @@ const Home = () => {
                 case 'Enter':
                     event.preventDefault();
                     if (selected >= 0) {
-                        setValue(recommendSearchArr[selected].sickNm);
+                        setValue(recsSearchList[selected].sickNm);
                         setSelected(-1);
                     }
                     break;
@@ -92,8 +84,8 @@ const Home = () => {
                     <RecommendContainer>
                         <RecommendSearch title={value} />
                         <SectionTitle>추천 검색어</SectionTitle>
-                        {recommendSearchArr.length !== 0 ? (
-                            recommendSearchArr.map((search, index) => {
+                        {recsSearchList.length !== 0 ? (
+                            recsSearchList.map((search, index) => {
                                 return (
                                     <RecommendSearch
                                         key={search.sickCd}
