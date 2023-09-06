@@ -10,19 +10,11 @@ const useRecsSearch = () => {
         const isKoreanJamo = (str: string) => /[ㄱ-ㅎㅏ-ㅣ]/.test(str);
         if (!isKoreanJamo(search) && search.length > 0) {
             const cachedResponse = await cacheStorage.getCache(search);
-            if (cachedResponse) {
-                const res = await cachedResponse.json();
-                const sliceRes =
-                    res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
-                setRecsSearchList(sliceRes);
-            } else {
-                const res = await getRecommendSearch(search);
-                const sliceRes =
-                    res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
-                await cacheStorage.setCache(search, sliceRes);
-                setRecsSearchList(sliceRes);
-            }
-        }
+            const res = cachedResponse ? cachedResponse.json : await getRecommendSearch(search);
+            const sliceRes = res.length > MAX_RECOMMEND_NUM ? res.slice(0, MAX_RECOMMEND_NUM) : res;
+            if (!cachedResponse) await cacheStorage.setCache(search, sliceRes);
+            setRecsSearchList(sliceRes);
+        } else setRecsSearchList([]);
     }, []);
     return {recsSearchList, getRecsSearch};
 };

@@ -30,7 +30,7 @@ const Home = () => {
 
     useEffect(() => {
         getRecsSearch(debouncedValue);
-    }, [debouncedValue]);
+    }, [debouncedValue, getRecsSearch]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (onFocus && recsSearchList.length > 0) {
