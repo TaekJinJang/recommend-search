@@ -14,6 +14,7 @@ const useRecentSearch = () => {
 
     // 새로운 검색어를 추가하고, 최대 7개의 항목만 유지합니다.
     const addNewRecentSearch = (search: string | searchItemType) => {
+        if (search === '') return;
         const searchList = getRecentSearches();
 
         const index = searchList.indexOf(search);
