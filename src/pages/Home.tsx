@@ -5,23 +5,25 @@ import useDebounceInput from 'hooks/useDebounceInput';
 import RecommendSearch from 'components/RecommendSearch';
 import useRecsSearch from 'hooks/useRecsSearch';
 import LoadingSpinner from 'components/LoadingSpinner';
-import {eventType} from 'types/search';
+import {eventType, searchItemType} from 'types/search';
+import useRecentSearch from 'hooks/useRecentSearch';
 
 const Home = () => {
     const [onFocus, setOnFocus] = useState<boolean>(false);
     const {value, setValue, handleInputChange, debouncedValue} = useDebounceInput();
-    const {recsSearchList, isLoading, getRecsSearch} = useRecsSearch();
     const [selected, setSelected] = useState(-1);
+    const {recsSearchList, isLoading, getRecsSearch} = useRecsSearch();
+    const {recentList, getRecentSearches, addNewRecentSearch} = useRecentSearch();
+    useEffect(() => {
+        getRecentSearches();
+    }, [getRecentSearches]);
+    const inputFocus = () => setOnFocus(true);
 
-    const inputFocus = () => {
-        setOnFocus(true);
-    };
-
-    const onSubmit = (event: eventType, str?: string) => {
+    const onSubmit = (event: eventType, str?: string | searchItemType) => {
         event.preventDefault();
-
-        console.info(str ? str : value);
+        if (!str && value === '') alert('검색어를 입력해주세요');
         setValue('');
+        addNewRecentSearch(str || value);
     };
 
     const searchRef = useRef<HTMLDivElement>(null);
@@ -42,11 +44,12 @@ const Home = () => {
     }, [debouncedValue, getRecsSearch]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (onFocus && recsSearchList.length > 0) {
-            const lastIndex = recsSearchList.length - 1;
+        if (onFocus) {
+            const searchList = value ? recsSearchList : recentList;
+            const lastIndex = value ? recsSearchList.length - 1 : recentList.length - 1;
             switch (event.key) {
                 case 'ArrowDown':
-                    if (recsSearchList.length - 1 > selected) setSelected(prev => prev + 1);
+                    if (searchList.length - 1 > selected) setSelected(prev => prev + 1);
                     if (lastIndex === selected) setSelected(0);
                     break;
                 case 'ArrowUp':
@@ -55,7 +58,8 @@ const Home = () => {
                     break;
                 case 'Enter':
                     if (selected >= 0) {
-                        onSubmit(event, recsSearchList[selected].sickNm);
+                        if (value) onSubmit(event, searchList[selected].sickNm);
+                        else onSubmit(event, searchList[selected]);
                         setSelected(-1);
                     }
                     break;
@@ -90,23 +94,45 @@ const Home = () => {
                 </SearchContainer>
                 {onFocus && (
                     <RecommendContainer>
-                        <RecommendSearch title={value} />
-                        <SectionTitle>추천 검색어</SectionTitle>
-                        {isLoading && <LoadingSpinner />}
-                        {recsSearchList.length !== 0 &&
-                            !isLoading &&
-                            recsSearchList.map((search, index) => {
-                                return (
-                                    <RecommendSearch
-                                        key={search.sickCd}
-                                        title={search.sickNm}
-                                        selected={selected === index}
-                                        onSubmit={onSubmit}
-                                    />
-                                );
-                            })}
-                        {recsSearchList.length === 0 && (
-                            <div className='noRecommend'>검색어 없음</div>
+                        {value ? (
+                            <>
+                                <RecommendSearch title={value} />
+                                <SectionTitle>추천 검색어</SectionTitle>
+                                {isLoading && <LoadingSpinner />}
+                                {recsSearchList.length !== 0 &&
+                                    !isLoading &&
+                                    recsSearchList.map((search, index) => {
+                                        return (
+                                            <RecommendSearch
+                                                key={search.sickCd}
+                                                title={search.sickNm}
+                                                selected={selected === index}
+                                                onSubmit={onSubmit}
+                                            />
+                                        );
+                                    })}
+                                {recsSearchList.length === 0 && (
+                                    <div className='noRecommend'>검색어 없음</div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <SectionTitle>최근 검색어</SectionTitle>
+                                {recentList.length !== 0 ? (
+                                    recentList.map((search, index) => {
+                                        return (
+                                            <RecommendSearch
+                                                key={index}
+                                                title={search}
+                                                selected={selected === index}
+                                                onSubmit={onSubmit}
+                                            />
+                                        );
+                                    })
+                                ) : (
+                                    <div className='noRecommend'>검색어 없음</div>
+                                )}
+                            </>
                         )}
                     </RecommendContainer>
                 )}
