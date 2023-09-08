@@ -2,11 +2,10 @@ import styled from 'styled-components';
 import {AiOutlineSearch} from 'react-icons/ai';
 import {useEffect, useRef, useState} from 'react';
 import useDebounceInput from 'hooks/useDebounceInput';
-import RecommendSearch from 'components/RecommendSearch';
 import useRecsSearch from 'hooks/useRecsSearch';
-import LoadingSpinner from 'components/LoadingSpinner';
 import {eventType, searchItemType} from 'types/search';
 import useRecentSearch from 'hooks/useRecentSearch';
+import SearchList from 'components/SearchList';
 
 const Home = () => {
     const [onFocus, setOnFocus] = useState<boolean>(false);
@@ -94,46 +93,13 @@ const Home = () => {
                 </SearchContainer>
                 {onFocus && (
                     <RecommendContainer>
-                        {value ? (
-                            <>
-                                <RecommendSearch title={value} />
-                                <SectionTitle>추천 검색어</SectionTitle>
-                                {isLoading && <LoadingSpinner />}
-                                {recsSearchList.length !== 0 &&
-                                    !isLoading &&
-                                    recsSearchList.map((search, index) => {
-                                        return (
-                                            <RecommendSearch
-                                                key={search.sickCd}
-                                                title={search.sickNm}
-                                                selected={selected === index}
-                                                onSubmit={onSubmit}
-                                            />
-                                        );
-                                    })}
-                                {recsSearchList.length === 0 && (
-                                    <div className='noRecommend'>검색어 없음</div>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                <SectionTitle>최근 검색어</SectionTitle>
-                                {recentList.length !== 0 ? (
-                                    recentList.map((search, index) => {
-                                        return (
-                                            <RecommendSearch
-                                                key={index}
-                                                title={search}
-                                                selected={selected === index}
-                                                onSubmit={onSubmit}
-                                            />
-                                        );
-                                    })
-                                ) : (
-                                    <div className='noRecommend'>검색어 없음</div>
-                                )}
-                            </>
-                        )}
+                        <SearchList
+                            title={value}
+                            searchList={value ? recsSearchList : recentList}
+                            isLoading={isLoading}
+                            selected={selected}
+                            onSubmit={onSubmit}
+                        />
                     </RecommendContainer>
                 )}
             </section>
@@ -196,12 +162,4 @@ const RecommendContainer = styled.div`
         text-align: center;
         color: #a7afb7;
     }
-`;
-
-const SectionTitle = styled.div`
-    padding: 0 20px;
-    margin: 6px 0;
-    font-size: 14px;
-    font-weight: 700;
-    color: #53585d;
 `;
