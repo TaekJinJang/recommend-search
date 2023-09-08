@@ -21,9 +21,7 @@
         "web-vitals": "^2.1.4"
     },
     "scripts": {
-        "start:frontend": "react-scripts start",
-        "start:backend": "json-server --watch db.json --port=4000",
-        "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+        "start": "react-scripts start",
         "build": "react-scripts build",
         "postinstall": "husky install",
         "format": "prettier --cache --write .",
@@ -53,11 +51,9 @@
     "devDependencies": {
         "@types/react-router-dom": "^5.3.3",
         "@types/styled-components": "^5.1.26",
-        "concurrently": "^8.2.1",
         "eslint": "^8.48.0",
         "eslint-config-prettier": "^9.0.0",
         "husky": "^8.0.3",
-        "json-server": "^0.17.3",
         "prettier": "^3.0.3"
     }
 }
