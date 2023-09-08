@@ -4,13 +4,21 @@
 ## 🙂 시작 가이드
 * 배포 주소
 
-  🔗 http://wanted-pre-onboarding-2week-personal.s3-website.ap-northeast-2.amazonaws.com
+  🔗 https://recommend-search.vercel.app/
 
 * 프로젝트 실행 방법
   ```
    $ npm install
    $ npm start
   ```
+
+
+## 🎥 화면 구성
+
+|   화면 구성     |   
+| :-------------------------: | 
+| ![recommendSearch](https://github.com/TaekJinJang/recommend-search/assets/93184838/7eb71b5c-5137-4865-8f70-98a4b25de0c0) |
+
 
 ## 📁 디렉토리 구조
 ```
@@ -60,48 +68,57 @@
 - 입력값이 아무것도 없으면 요청하지 않습니다.
 - 디바운싱을 활용해 500ms이상 타이핑이 멈추면 데이터를 요청하도록 유도하여 불필요한 요청을 줄였습니다.
 - 한글의 경우 완전한 음절이 완성되지 않으면(자음/모음만 입력 시) 해당 부분을 필터링하여 요청합니다.
-    <details>
-    <summary><b>👈코드 보기</b></summary>
-        <div markdown="1">
-            <ul>
-             https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/utils/regex.ts#L1-L5
-            </ul>
-        </div></details>
+
+  https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/utils/regex.ts#L1-L5
+
   
 - API 요청 결과는 캐싱하고, 이후 동일한 요청이 들어오면 API 요청 대신 캐싱된 값을 활용합니다.(캐싱데이터 expire time: 12시간)
-  <details>
-    <summary><b>👈코드 보기</b></summary>
-        <div markdown="1">
-            <ul>
-              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/hooks/useRecsSearch.ts#L15-L24
-            </ul>
-        </div></details>
+  
+  https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/hooks/useRecsSearch.ts#L15-L24
+
   
 
 ### 3. 키보드를 이용한 추천 검색어 기능 사용법
 - 검색어를 입력했을 때 추천 검색어가 없으면, '추천 검색어가 없습니다'라는 문구가 출력됩니다.
 - 추천 검색어가 있는 경우 키보드 위/아래 방향키로 이동 가능하고, 엔터 키를 눌러 검색할 수 있습니다.
-    <details>
-    <summary><b>👈코드 보기</b></summary>
-        <div markdown="1">
-            <ul>
-              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/pages/Home.tsx#L45-L69
-        </div></details>
+
+  https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/pages/Home.tsx#L45-L69
+
 
 ### 4. 포커싱 이후 입력값이 없다면 최근 검색어 호출
 - 사용자가 검색창에 포커스를 맞추고 아무런 입력값도 없다면, 이전에 검색했던 단어들이 최근 검색어로 보여집니다. 이 정보들은 사용자가 이전에 검색한 내용을 기반으로 sessionStorage에 저장되어 있습니다.
 - 사용자가 특정 단어로 검색을 실행하면 해당 단어는 즉시 sessionStorage에 저장됩니다. 그 후, 다시 한번 검색창에 포커스를 맞추면, 저장된 최근 검색어 목록이 보여집니다.
 - 만약 동일한 단어를 여러 번 검색했다면, 해당 단어는 목록에서 중복되지 않으며 가장 최신의 조회 순서로 목록의 맨 앞으로 배치됩니다.
 - 최근 검색어 목록은 한 번에 최대 7개까지만 보여줍니다. 새로운 단어가 추가되면서 목록의 수가 7개를 초과하게 되면, 가장 오래된(즉, 목록의 마지막 위치한)검색단어부터 삭제됩니다.
-    <details>
-    <summary><b>👈코드 보기</b></summary>
-        <div markdown="1">
-            <ul>
-              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/hooks/useRecentSearch.ts#L7-L35
-        </div></details>
+
+  https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/hooks/useRecentSearch.ts#L7-L35
+
+## 💡 Best Practice 도출
+팀원들과 함께 고민한 내용들은 아래 링크에서 확인하실 수 있습니다.
+- [Notion 링크](https://motley-bird-51b.notion.site/Best-Practice-44d333bf327f4ed182c6d7c9b6ed1361?pvs=4) 참고
 
 ## 🔫 트러블 슈팅
-- [Notion 링크](https://motley-bird-51b.notion.site/ed4d9639fd4e4d81ae7a688d70eb5bf8?pvs=4) 참고
+### Input에서 '[', '*' 입력 시 ERROR 발생
+- **문제**
+  - Input의 value 값 중 한글의 모음,자음이 포함된 경우 정규표현식의 replace 메소드를 통해 필터링
+  - `'['`, `'*'`  등 value 값에 포함된 경우 메타 문자로 인식하여 오류
+- **해결방안**
+  - 메타 문자를 일반 문자로 처리하도록 이스케이프 처리를 적용
+  - `const regex = string.replace(/[ㄱ-ㅎㅏ-ㅣ[*]/g, '');`
+### Input에서 추천 검색어 클릭 시 검색 상자 사라짐
+- **문제**
+  - Input 요소의 onFocus와 onBlur 이벤트 핸들러를 사용하여 추천 검색어를 보여주는 검색 상자의 표시 여부를 제어
+  - 추천 검색어를 클릭하는 순간, onBlur 이벤트가 발생하면서 검색 상자가 사라지는 문제가 발생
+- **해결방안**
+  - **1번 방법으로 해결!**
+  1. `useRef`, `useEffect`, 그리고 `addEventListener`를 활용하여 문제를 해결
+  2. Input과 검색 상자에 대해 감싸는 section 태그를 추가하고, CSS 선택자와 속성을 이용하여 검색 상자의 display 속성값을 변경.
+  ``` js
+  &:has(input:focus) {
+        & > div {
+            display: block;
+        }
+    }```
 
 ## 💡 기술스택 
 
