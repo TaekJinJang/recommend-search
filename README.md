@@ -47,15 +47,14 @@
 ### `키보드만으로 추천 검색어 이동`
 - 사용자가 추천된 검색어 중 **원하는 항목으로 이동하고 선택**할 수 있도록, 위/아래 방향키(ArrowUp/ArrowDown)와 엔터 키의 조합을 활용할 수 있습니다.
 
-## ⭐️ 과제 구현 방법 ⭐️
+## ⭐️ 구현 방법 ⭐️
 
 ### 1. 로컬 캐싱 구현 방법
 - **로컬 캐싱 구현 목표** - 로컬캐싱을 활용하여 API 호출 횟수를 줄이는 것을 목표로하여 구현하였습니다.
-  
-  -
-- **변경 된 데이터 값을 적절한 시점에 가져오는 방법**
-  
-    - 캐시 된 데이터를 찾았으나 expireTime이 현재 시간 기준 만료 되었다면 리패칭 하여 받아온 데이터로 교체합니다.
+  - 브라우저의 Cache Storage에 API 요청을 캐싱합니다.
+  - Cache Storage에 데이터 저장 시 header에 캐시 시간과 body에 데이터를 저장합니다.
+  - 이후 동일한 쿼리로 요청이 발생하면 match() 메소드로 비교후 쿼리가 같은 경우 새로 API 요청을 하지 않고, 캐시 데이터를 반환합니다.
+  - 캐시 된 데이터를 찾았으나 expireTime이 현재 시간 기준 만료 되었다면 리패칭 하여 받아온 데이터로 교체합니다.
 
 ### 2. 입력별 API 호출 횟수를 줄이는 전략
 - 입력값이 아무것도 없으면 요청하지 않습니다.
@@ -65,7 +64,7 @@
     <summary><b>👈코드 보기</b></summary>
         <div markdown="1">
             <ul>
-              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/utils/regex.ts#L1-L5C3
+             https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/utils/regex.ts#L1-L5
             </ul>
         </div></details>
   
@@ -74,7 +73,7 @@
     <summary><b>👈코드 보기</b></summary>
         <div markdown="1">
             <ul>
-              https://github.com/wanted-pre-onboarding-12th-11/pre-onboarding-12th-3-11/blob/fca886da3c84a7fb7575d44df6a96b4b5b0ab1a4/src/utils/searchTrieCache.ts#L146-L187
+              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/hooks/useRecsSearch.ts#L15-L24
             </ul>
         </div></details>
   
@@ -86,10 +85,20 @@
     <summary><b>👈코드 보기</b></summary>
         <div markdown="1">
             <ul>
-              https://github.com/wanted-pre-onboarding-12th-11/pre-onboarding-12th-3-11/blob/9ef6d4375164faabf717b3f8a7ccfb8e54b94baf/src/hooks/useKeyboard.ts#L3-L43
-            </ul>
+              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/pages/Home.tsx#L45-L69
         </div></details>
 
+### 4. 포커싱 이후 입력값이 없다면 최근 검색어 호출
+- 사용자가 검색창에 포커스를 맞추고 아무런 입력값도 없다면, 이전에 검색했던 단어들이 최근 검색어로 보여집니다. 이 정보들은 사용자가 이전에 검색한 내용을 기반으로 sessionStorage에 저장되어 있습니다.
+- 사용자가 특정 단어로 검색을 실행하면 해당 단어는 즉시 sessionStorage에 저장됩니다. 그 후, 다시 한번 검색창에 포커스를 맞추면, 저장된 최근 검색어 목록이 보여집니다.
+- 만약 동일한 단어를 여러 번 검색했다면, 해당 단어는 목록에서 중복되지 않으며 가장 최신의 조회 순서로 목록의 맨 앞으로 배치됩니다.
+- 최근 검색어 목록은 한 번에 최대 7개까지만 보여줍니다. 새로운 단어가 추가되면서 목록의 수가 7개를 초과하게 되면, 가장 오래된(즉, 목록의 마지막 위치한)검색단어부터 삭제됩니다.
+    <details>
+    <summary><b>👈코드 보기</b></summary>
+        <div markdown="1">
+            <ul>
+              https://github.com/TaekJinJang/recommend-search/blob/34801cbaeb4b292d63770bcba451c1c452d8aa00/src/hooks/useRecentSearch.ts#L7-L35
+        </div></details>
 
 ## 🔫 트러블 슈팅
 - [Notion 링크](https://motley-bird-51b.notion.site/ed4d9639fd4e4d81ae7a688d70eb5bf8?pvs=4) 참고
