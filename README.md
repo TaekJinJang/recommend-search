@@ -1,5 +1,6 @@
 # 한국 임상정보 검색 기능 클론
-- 검색 + 검색어 추천 + 최근 검색어 + 데이터 캐싱 기능을 구현했습니다. 
+※ 본 과제는 [원티드 프리온보딩 인턴십 8월](https://www.wanted.co.kr/events/pre_ob_fe_12)를 바탕으로 진행되었습니다.
+- 검색 + 검색어 추천 + 최근 검색어 + 데이터 캐싱 기능을 구현했습니다.
 
 ## 🙂 시작 가이드
 * 배포 주소
@@ -95,7 +96,8 @@
 
 ## 💡 Best Practice 도출
 팀원들과 함께 고민한 내용들은 아래 링크에서 확인하실 수 있습니다.
-- [Notion 링크](https://motley-bird-51b.notion.site/Best-Practice-44d333bf327f4ed182c6d7c9b6ed1361?pvs=4) 참고
+- [Notion 링크](https://motley-bird-51b.notion.site/Best-Practice-44d333bf327f4ed182c6d7c9b6ed1361?pvs=4)
+
 
 ## 🔫 트러블 슈팅
 ### Input에서 '[', '*' 입력 시 ERROR 발생
